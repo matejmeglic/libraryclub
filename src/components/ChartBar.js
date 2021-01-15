@@ -23,14 +23,14 @@ export default function Chart(props) {
 
     data.push({
       date: props.books_per_date[i].date_read,
-      knjige: count,
+      value: count,
       reader: props.books_per_date[i].reader,
     });
   }
 
   return (
     <React.Fragment>
-      <Title>Prebrane knjige</Title>
+      <Title>Branje</Title>
       <ResponsiveContainer>
         <LineChart
           width={500}
@@ -48,12 +48,7 @@ export default function Chart(props) {
           <Tooltip />
           <Legend />
           <Label />
-          <Line
-            type="monotone"
-            strokeWidth={3}
-            dataKey="knjige"
-            stroke="#8884d8"
-          />
+          <Line type="monotone" dataKey="value" stroke="#8884d8" />
         </LineChart>
       </ResponsiveContainer>
     </React.Fragment>

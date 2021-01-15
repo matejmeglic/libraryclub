@@ -20,6 +20,7 @@ import { mainListItems } from "./listItems";
 import Chart from "./Chart";
 import Deposits from "./Deposits";
 import Orders from "./Orders";
+import ReaderCard from "./ReaderCard";
 
 function Copyright() {
   return (
@@ -115,7 +116,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function Dashboard() {
+export default function Dashboard(props) {
   const classes = useStyles();
   const [open, setOpen] = React.useState(false);
   const handleDrawerOpen = () => {
@@ -176,22 +177,40 @@ export default function Dashboard() {
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
+            {/* Readers Card */}
+            {props.json.readers_cumulative
+              .sort((a, b) => (a.reader > b.reader ? 1 : -1))
+              .map((item) => (
+                <Grid item xs={12} md={4} lg={3}>
+                  <Paper className={fixedHeightPaper}>
+                    <ReaderCard reader_info={item} />
+                  </Paper>
+                </Grid>
+              ))}
+
             {/* Chart */}
             <Grid item xs={12} md={8} lg={9}>
               <Paper className={fixedHeightPaper}>
-                <Chart />
+                <Chart books_per_date={props.json.books_per_date} />
               </Paper>
             </Grid>
             {/* Recent Deposits */}
             <Grid item xs={12} md={4} lg={3}>
               <Paper className={fixedHeightPaper}>
-                <Deposits />
+                <Deposits
+                  readers_cumulative={props.json.readers_cumulative}
+                  today={
+                    props.json.books_per_date[
+                      props.json.books_per_date.length - 1
+                    ].date
+                  }
+                />
               </Paper>
             </Grid>
             {/* Recent Orders */}
             <Grid item xs={12}>
               <Paper className={classes.paper}>
-                <Orders />
+                <Orders books={props.json.books} />
               </Paper>
             </Grid>
           </Grid>
