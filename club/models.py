@@ -4,7 +4,7 @@ from django.db import models
 
 
 class Reader(models.Model):
-    name = models.TextField("Ime in priimek")
+    name = models.CharField("Ime in priimek", max_length=20)
 
     class Meta:
         verbose_name = "Bralec/Bralka"
@@ -16,8 +16,8 @@ class Reader(models.Model):
 
 class Book(models.Model):
     reader = models.ForeignKey(Reader, on_delete=models.CASCADE)
-    name = models.TextField("Naslov knjige", max_length=40)
-    author = models.TextField("Avtor", max_length=40)
+    name = models.CharField("Naslov knjige", max_length=80)
+    author = models.CharField("Avtor", max_length=80)
     description = models.TextField("Opis knjige", max_length=300)
     date_read = models.DateField("Datum")
 
