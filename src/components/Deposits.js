@@ -18,7 +18,7 @@ export default function Deposits(props) {
 
   return (
     <React.Fragment>
-      <Title>Prebranih</Title>
+      <Title>Prebrali smo že</Title>
       <Typography component="p" variant="h4">
         {sum} knjig
       </Typography>

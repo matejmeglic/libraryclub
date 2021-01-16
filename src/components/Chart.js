@@ -14,19 +14,65 @@ import Title from "./Title";
 
 export default function Chart(props) {
   let data = [];
+  let readers = [];
 
-  let count = 0;
-  for (var i = 0; i < props.books_per_date.length; i++) {
-    // var parts = props.books_per_date[i].date_read.split("-");
-    // var mydate = new Date(parts[0], parts[1] - 1, parts[2]);
-    count += props.books_per_date[i].sum;
-
-    data.push({
-      date: props.books_per_date[i].date_read,
-      knjige: count,
-      reader: props.books_per_date[i].reader,
-    });
+  // list all readers
+  for (
+    var j = 0;
+    j < props.books_per_date[0]["reader_books_cumulative"].length;
+    j++
+  ) {
+    readers.push(props.books_per_date[0]["reader_books_cumulative"][j][0]);
   }
+
+  // order data object
+  for (var i = 0; i < props.books_per_date.length; i++) {
+    data.push({
+      date: props.books_per_date[i].date,
+      sum: props.books_per_date[i].sum,
+      sum_cumulative: props.books_per_date[i].sum_cumulative,
+    });
+    // add readers_books to the data object
+    for (var k = 0; k < readers.length; k++) {
+      if (props.books_per_date[i].reader_books_cumulative[k][1] === 0) {
+        data[i][readers[k]] = undefined;
+      } else {
+        data[i][readers[k]] =
+          props.books_per_date[i].reader_books_cumulative[k][1];
+      }
+    }
+  }
+
+  console.log(data);
+  console.log(readers);
+
+  //set list
+  let list = [];
+
+  let count = 1;
+  readers
+    .sort()
+    .reverse()
+    .forEach((item) => {
+      list.unshift(
+        <Line
+          type="monotone"
+          strokeWidth={2}
+          dataKey={item}
+          stroke={props.colors[count]}
+        />
+      );
+      count++;
+    });
+
+  list.push(
+    <Line
+      type="monotone"
+      strokeWidth={5}
+      dataKey="sum_cumulative"
+      stroke={props.colors[0]}
+    />
+  );
 
   return (
     <React.Fragment>
@@ -48,12 +94,7 @@ export default function Chart(props) {
           <Tooltip />
           <Legend />
           <Label />
-          <Line
-            type="monotone"
-            strokeWidth={3}
-            dataKey="knjige"
-            stroke="#8884d8"
-          />
+          {list}
         </LineChart>
       </ResponsiveContainer>
     </React.Fragment>

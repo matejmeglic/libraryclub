@@ -34,6 +34,7 @@ def index(request):
         )
 
     # create readers collection
+    color_counter = 0
     for reader in readers_dict:
         readers_collection = []
         count = 0
@@ -91,6 +92,9 @@ def index(request):
             if book.get("days_from_last_book") > max_time:
                 max_time = book.get("days_from_last_book")
 
+        # set color
+        color_counter += 1  # 0 is reserved for system or sum
+
         # get readers cumulative data
         readers_cumulative.append(
             {
@@ -100,6 +104,7 @@ def index(request):
                 "time_avg": calculate_avg,
                 "time_min": min_time,
                 "time_max": max_time,
+                "color_counter": color_counter,
             }
         )
 
@@ -109,7 +114,7 @@ def index(request):
     date_diff = (date_today - date_book_current).days
     date_counter = 0
     books_per_date = []
-
+    cumulative_sum = 0
     while date_counter <= date_diff:
         book_date = []
         book_counter = 0
@@ -117,14 +122,49 @@ def index(request):
             if date_book_current == book.get("date_read"):
                 book_date.append(book)
                 book_counter += 1
+                cumulative_sum += 1
         books_per_date.append(
             {
                 "day": date_counter,
                 "date": date_book_current,
                 "sum": book_counter,
+                "sum_cumulative": cumulative_sum,
                 "books": book_date,
+                "reader_books": [],
+                "reader_books_cumulative": [],
             }
         )
+        # readers per-day rendering
+        reader_books = []
+        reader_books_cumulative = []
+        for reader in readers_dict:
+            count_reader_books = 0
+            for book in book_date:
+                if book.get("reader") == reader.get("reader"):
+                    count_reader_books += 1
+            reader_books.append([reader.get("reader"), count_reader_books])
+            # cumulative
+
+            sum_books = 0
+            if len(books_per_date) < 1:
+                ""
+            elif len(books_per_date) < 2:
+                reader_books_cumulative = reader_books
+            else:
+                for book_pd in books_per_date[len(books_per_date) - 2][
+                    "reader_books_cumulative"
+                ]:
+
+                    if reader.get("reader") == book_pd[0]:
+
+                        sum_books = book_pd[1] + count_reader_books
+
+                reader_books_cumulative.append([reader.get("reader"), sum_books])
+
+        books_per_date[len(books_per_date) - 1]["reader_books"] = reader_books
+        books_per_date[len(books_per_date) - 1][
+            "reader_books_cumulative"
+        ] = reader_books_cumulative
 
         date_counter += 1
         date_book_current += timedelta(days=1)

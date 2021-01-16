@@ -127,6 +127,19 @@ export default function Dashboard(props) {
   };
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
+  const colors = [
+    "#8884d8",
+    "#f44336",
+    "#9c27b0",
+    "#4caf50",
+    "#cddc39",
+    "#ff9800",
+    "#ffeb3b",
+    "#607d8b",
+    "#ff9e80",
+    "#3f51b5",
+  ];
+
   return (
     <div className={classes.root}>
       <CssBaseline />
@@ -177,21 +190,13 @@ export default function Dashboard(props) {
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
           <Grid container spacing={3}>
-            {/* Readers Card */}
-            {props.json.readers_cumulative
-              .sort((a, b) => (a.reader > b.reader ? 1 : -1))
-              .map((item) => (
-                <Grid item xs={12} md={4} lg={3}>
-                  <Paper className={fixedHeightPaper}>
-                    <ReaderCard reader_info={item} />
-                  </Paper>
-                </Grid>
-              ))}
-
             {/* Chart */}
             <Grid item xs={12} md={8} lg={9}>
               <Paper className={fixedHeightPaper}>
-                <Chart books_per_date={props.json.books_per_date} />
+                <Chart
+                  books_per_date={props.json.books_per_date}
+                  colors={colors}
+                />
               </Paper>
             </Grid>
             {/* Recent Deposits */}
@@ -207,6 +212,18 @@ export default function Dashboard(props) {
                 />
               </Paper>
             </Grid>
+
+            {/* Readers Card */}
+            {props.json.readers_cumulative
+              .sort((a, b) => (a.reader > b.reader ? 1 : -1))
+              .map((item) => (
+                <Grid item xs={12} md={4} lg={3}>
+                  <Paper className={fixedHeightPaper}>
+                    <ReaderCard reader_info={item} colors={colors} />
+                  </Paper>
+                </Grid>
+              ))}
+
             {/* Recent Orders */}
             <Grid item xs={12}>
               <Paper className={classes.paper}>

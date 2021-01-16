@@ -11,9 +11,18 @@ const useStyles = makeStyles({
 
 export default function ReaderCard(props) {
   const classes = useStyles();
+
+  console.log(props.colors[props.reader_info.color_counter]);
   return (
     <React.Fragment>
-      <Title>{props.reader_info.reader}</Title>
+      <Typography
+        style={{
+          color: props.colors[props.reader_info.color_counter],
+        }}
+        variant="h6"
+      >
+        {props.reader_info.reader}
+      </Typography>
       <Typography component="p" variant="h4">
         {props.reader_info.books_read} knjig
       </Typography>
