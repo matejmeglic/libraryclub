@@ -128,6 +128,7 @@ export default function Dashboard(props) {
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
 
   const colors = [
+    "#3f51b5",
     "#8884d8",
     "#f44336",
     "#9c27b0",
@@ -137,7 +138,6 @@ export default function Dashboard(props) {
     "#ffeb3b",
     "#607d8b",
     "#ff9e80",
-    "#3f51b5",
   ];
 
   return (
