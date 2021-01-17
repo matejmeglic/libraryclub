@@ -138,6 +138,7 @@ export default function Dashboard(props) {
     "#ffeb3b",
     "#607d8b",
     "#ff9e80",
+    "#ff9e80",
   ];
 
   return (
