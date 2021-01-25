@@ -1,13 +1,28 @@
+from django.db.models.aggregates import Count
 from django.shortcuts import render
-from .models import Book, Reader
+from .models import Book, Reader, Season, Team
 import os
 from datetime import date, timedelta
 
 
 def index(request):
     # get data from db
-    query_books = Book.objects.order_by("date_read")
-    query_readers = Reader.objects.distinct()
+    query_team = "Kernovi"
+    active_season = 2021
+    query_season = Season.objects.filter(team__team_name=query_team).filter(
+        season_name=active_season
+    )
+    query_readers = Reader.objects.filter(
+        team__team_name__contains=query_team
+    ).distinct()
+    query_books = (
+        Book.objects.filter(reader__in=query_readers)
+        .filter(
+            date_read__gte=query_season[0].season_start,
+            date_read__lte=query_season[0].season_end,
+        )
+        .order_by("date_read")
+    )
 
     books = []
     readers_dict = []
@@ -17,7 +32,14 @@ def index(request):
     # Transform data for graphs
     # readers dict
     for reader in query_readers:
-        readers_dict.append({"reader_id": reader.id, "reader": reader.name})
+        readers_dict.append(
+            {
+                "reader_id": reader.id,
+                "reader": reader.name,
+                "started_reading": reader.started_reading,
+                "color": reader.color,
+            }
+        )
 
     # books dict
     for book in query_books:
@@ -34,7 +56,7 @@ def index(request):
         )
 
     # create readers collection
-    color_counter = 0
+    date_today = date.today()
     for reader in readers_dict:
         readers_collection = []
         count = 0
@@ -44,6 +66,12 @@ def index(request):
             if book.get("reader_id") == reader.get("reader_id"):
                 if count == 0:
                     previous_date = book.get("date_read")
+                    days_from_last_book = (
+                        book.get("date_read")
+                        - reader.get(
+                            "started_reading"
+                        )  # implement started reading date for accurate AVG
+                    ).days
                 else:
                     days_from_last_book = (book.get("date_read") - previous_date).days
                 count += 1
@@ -65,6 +93,7 @@ def index(request):
             {
                 "reader_id": reader.get("reader_id"),
                 "reader": reader.get("reader"),
+                "color": reader.get("color"),
                 "books_read": readers_collection,
             }
         )
@@ -79,7 +108,7 @@ def index(request):
         else:
             calculate_avg = 0
 
-        # calculate time_min, time_max
+        # calculate time_min, time_max, time_since_last
         min_time = 0
         max_time = 0
         for book in readers_collection:
@@ -91,30 +120,46 @@ def index(request):
                 min_time = book.get("days_from_last_book")
             if book.get("days_from_last_book") > max_time:
                 max_time = book.get("days_from_last_book")
+        if (count - 1) < 0:
+            time_since_last = ""
+        else:
+            time_since_last = (
+                date_today - readers_collection[count - 1].get("date_read")
+            ).days
 
-        # set color
-        color_counter += 1  # 0 is reserved for system or sum
-
-        # get readers cumulative data
-        readers_cumulative.append(
-            {
-                "reader_id": reader.get("reader_id"),
-                "reader": reader.get("reader"),
-                "books_read": count,
-                "time_avg": calculate_avg,
-                "time_min": min_time,
-                "time_max": max_time,
-                "color_counter": color_counter,
-            }
-        )
+        # don't send reader's data if he has no active books in this season
+        if len(readers_collection) == 0:
+            ""
+        else:
+            # get readers cumulative data
+            readers_cumulative.append(
+                {
+                    "reader_id": reader.get("reader_id"),
+                    "reader": reader.get("reader"),
+                    "color": reader.get("color"),
+                    "books_read": count,
+                    "time_avg": calculate_avg,
+                    "time_min": min_time,
+                    "time_max": max_time,
+                    "time_since_last": time_since_last,
+                }
+            )
 
     # books per date
-    date_today = date.today()
-    date_book_current = books[0].get("date_read")
+    date_book_current = query_season[0].season_start
     date_diff = (date_today - date_book_current).days
     date_counter = 0
     books_per_date = []
     cumulative_sum = 0
+    readers_start_date = []
+    sum_daily = []
+    for reader in readers_dict:  # get diff for start date "null"
+        readers_start_date.append(
+            [
+                reader.get("reader"),
+                (reader.get("started_reading") - date_book_current).days,
+            ]
+        )
     while date_counter <= date_diff:
         book_date = []
         book_counter = 0
@@ -127,7 +172,7 @@ def index(request):
             {
                 "day": date_counter,
                 "date": date_book_current,
-                "sum": book_counter,
+                "sum_today": book_counter,
                 "sum_cumulative": cumulative_sum,
                 "books": book_date,
                 "reader_books": [],
@@ -138,28 +183,43 @@ def index(request):
         reader_books = []
         reader_books_cumulative = []
         for reader in readers_dict:
-            count_reader_books = 0
-            for book in book_date:
-                if book.get("reader") == reader.get("reader"):
-                    count_reader_books += 1
-            reader_books.append([reader.get("reader"), count_reader_books])
-            # cumulative
+            for start_date in readers_start_date:
+                if reader.get("reader") == start_date[0]:
+                    if date_counter < start_date[1]:
+                        ""  # if user didn't start reading yet, don't show anything
+                    else:
+                        count_reader_books = 0
+                        for book in book_date:
+                            if book.get("reader") == reader.get("reader"):
+                                count_reader_books += 1
+                        # don't send reader's data if he has no active books in this season
+                        for reader_cum in readers_cumulative:
+                            if reader.get("reader") == reader_cum.get("reader"):
+                                reader_books.append(
+                                    [reader.get("reader"), count_reader_books]
+                                )
+                        # cumulative
 
-            sum_books = 0
-            if len(books_per_date) < 1:
-                ""
-            elif len(books_per_date) < 2:
-                reader_books_cumulative = reader_books
-            else:
-                for book_pd in books_per_date[len(books_per_date) - 2][
-                    "reader_books_cumulative"
-                ]:
+                        sum_books = 0
+                        if len(books_per_date) < 1:
+                            ""
+                        elif len(books_per_date) < 2:
+                            reader_books_cumulative = reader_books
+                        else:
+                            for book_pd in books_per_date[len(books_per_date) - 2][
+                                "reader_books_cumulative"
+                            ]:
+                                if reader.get("reader") == book_pd[0]:
+                                    sum_books = book_pd[1] + count_reader_books
 
-                    if reader.get("reader") == book_pd[0]:
-
-                        sum_books = book_pd[1] + count_reader_books
-
-                reader_books_cumulative.append([reader.get("reader"), sum_books])
+                            # don't send reader's data if he has no active books in this season
+                            for reader_cum in readers_cumulative:
+                                if reader.get("reader") == reader_cum.get("reader"):
+                                    reader_books_cumulative.append(
+                                        [reader.get("reader"), sum_books]
+                                    )
+        # sum line
+        reader_books_cumulative.append(["Skupaj", cumulative_sum])
 
         books_per_date[len(books_per_date) - 1]["reader_books"] = reader_books
         books_per_date[len(books_per_date) - 1][
@@ -169,6 +229,14 @@ def index(request):
         date_counter += 1
         date_book_current += timedelta(days=1)
 
+    # cumulative books sorted by readers for every day of the season
+    books_daily = []
+    for day in books_per_date:
+        daily_object = {"date": day.get("date")}
+        for reader_book in day.get("reader_books_cumulative"):
+            daily_object[reader_book[0]] = reader_book[1]
+        books_daily.append(daily_object)
+
     # pack all data to context for json extraction on FE
     all_data = {
         "books": books,
@@ -176,6 +244,7 @@ def index(request):
         "books_per_date": books_per_date,
         "readers_cumulative": readers_cumulative,
         "readers_dict": readers_dict,
+        "books_daily": books_daily,
     }
     context = {"all_data": all_data}
 

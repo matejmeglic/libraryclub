@@ -12,7 +12,6 @@ const useStyles = makeStyles({
 export default function ReaderCard(props) {
   const classes = useStyles();
 
-  console.log(props.colors[props.reader_info.color_counter]);
   return (
     <React.Fragment>
       <Typography

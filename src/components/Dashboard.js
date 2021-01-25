@@ -114,6 +114,9 @@ const useStyles = makeStyles((theme) => ({
   fixedHeight: {
     height: 240,
   },
+  chartHeight: {
+    height: 360,
+  },
 }));
 
 export default function Dashboard(props) {
@@ -126,6 +129,7 @@ export default function Dashboard(props) {
     setOpen(false);
   };
   const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+  const chartHeightPaper = clsx(classes.paper, classes.chartHeight);
 
   const colors = [
     "#3f51b5",
@@ -145,6 +149,9 @@ export default function Dashboard(props) {
     <div className={classes.root}>
       <CssBaseline />
       <AppBar
+        style={{
+          background: "linear-gradient(to right bottom, #430089, #82ffa1)",
+        }}
         position="absolute"
         className={clsx(classes.appBar, open && classes.appBarShift)}
       >
@@ -193,10 +200,11 @@ export default function Dashboard(props) {
           <Grid container spacing={3}>
             {/* Chart */}
             <Grid item xs={12} md={8} lg={9}>
-              <Paper className={fixedHeightPaper}>
+              <Paper className={chartHeightPaper}>
                 <Chart
                   books_per_date={props.json.books_per_date}
-                  colors={colors}
+                  books_daily={props.json.books_daily}
+                  readers_cumulative={props.json.readers_cumulative}
                 />
               </Paper>
             </Grid>
