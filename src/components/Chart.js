@@ -1,5 +1,5 @@
 import React from "react";
-
+import { Button } from "@material-ui/core";
 import {
   LineChart,
   Line,
@@ -13,48 +13,16 @@ import {
 import Title from "./Title";
 
 export default function Chart(props) {
-  let data = [];
   let readers = [];
+  let list = [];
 
-  // // list all readers
-  // for (
-  //   var j = 0;
-  //   j < props.books_per_date[0]["reader_books_cumulative"].length;
-  //   j++
-  // ) {
-  //   readers.push(props.books_per_date[0]["reader_books_cumulative"][j][0]);
-  // }
-
-  // // order data object
-  // for (var i = 0; i < props.books_per_date.length; i++) {
-  //   data.push({
-  //     date: props.books_per_date[i].date,
-  //     sum: props.books_per_date[i].sum,
-  //     sum_cumulative: props.books_per_date[i].sum_cumulative,
-  //   });
-  //   // add readers_books to the data object
-  //   for (var k = 0; k < readers.length; k++) {
-  //     if (props.books_per_date[i].reader_books_cumulative[k][1] === 0) {
-  //       data[i][readers[k]] = undefined;
-  //     } else {
-  //       data[i][readers[k]] =
-  //         props.books_per_date[i].reader_books_cumulative[k][1];
-  //     }
-  //   }
-  // }
-
+  // readers lines
   for (var j = 0; j < props.readers_cumulative.length; j++) {
     readers.push([
       props.readers_cumulative[j].reader,
       [props.readers_cumulative[j].color],
     ]);
   }
-
-  console.log(readers);
-  console.log(data);
-
-  //set list
-  let list = [];
 
   readers
     .sort()
@@ -71,6 +39,18 @@ export default function Chart(props) {
       );
     });
 
+  if (props.goals.goal_per_month === true) {
+    list.push(
+      <Line
+        type="monotone"
+        strokeWidth={1}
+        dataKey={"Mesečni cilj"}
+        stroke={"#d4d4d4"}
+        dot={false}
+      />
+    );
+  }
+
   list.push(
     <Line
       type="monotone"
@@ -81,9 +61,26 @@ export default function Chart(props) {
     />
   );
 
+  const [showResults, setShowResults] = React.useState(false);
+  const onClick = () => setShowResults(!showResults);
+
   return (
     <React.Fragment style={{ height: "400px" }}>
-      <Title>Prebrane knjige</Title>
+      <Title>
+        Prebrane knjige{"   "}
+        {props.goals.goal_per_season === true ? (
+          <Button
+            variant="contained"
+            width={100}
+            style={{ marginLeft: "10px" }}
+            onClick={onClick}
+          >
+            Cilj sezone
+          </Button>
+        ) : (
+          ""
+        )}
+      </Title>
       <ResponsiveContainer>
         <LineChart
           width={500}
@@ -102,6 +99,15 @@ export default function Chart(props) {
           <Legend />
           <Label />
           {list}
+          {showResults ? (
+            <Line
+              type="monotone"
+              strokeWidth={4}
+              dataKey={"Cilj sezone"}
+              stroke={"#82ffa1"}
+              dot={false}
+            />
+          ) : null}
         </LineChart>
       </ResponsiveContainer>
     </React.Fragment>

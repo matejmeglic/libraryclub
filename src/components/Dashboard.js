@@ -18,8 +18,8 @@ import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import { mainListItems } from "./listItems";
 import Chart from "./Chart";
-import Deposits from "./Deposits";
-import Orders from "./Orders";
+import TotalTeam from "./Total_team";
+import ListBooks from "./List_books";
 import ReaderCard from "./ReaderCard";
 
 function Copyright() {
@@ -111,8 +111,8 @@ const useStyles = makeStyles((theme) => ({
     overflow: "auto",
     flexDirection: "column",
   },
-  fixedHeight: {
-    height: 240,
+  readerHeight: {
+    height: 480,
   },
   chartHeight: {
     height: 360,
@@ -128,22 +128,8 @@ export default function Dashboard(props) {
   const handleDrawerClose = () => {
     setOpen(false);
   };
-  const fixedHeightPaper = clsx(classes.paper, classes.fixedHeight);
+  const readerHeightPaper = clsx(classes.paper, classes.readerHeight);
   const chartHeightPaper = clsx(classes.paper, classes.chartHeight);
-
-  const colors = [
-    "#3f51b5",
-    "#8884d8",
-    "#f44336",
-    "#9c27b0",
-    "#4caf50",
-    "#cddc39",
-    "#ff9800",
-    "#ffeb3b",
-    "#607d8b",
-    "#ff9e80",
-    "#ff9e80",
-  ];
 
   return (
     <div className={classes.root}>
@@ -205,14 +191,16 @@ export default function Dashboard(props) {
                   books_per_date={props.json.books_per_date}
                   books_daily={props.json.books_daily}
                   readers_cumulative={props.json.readers_cumulative}
+                  goals={props.json.goals}
                 />
               </Paper>
             </Grid>
-            {/* Recent Deposits */}
+            {/* Total team */}
             <Grid item xs={12} md={4} lg={3}>
-              <Paper className={fixedHeightPaper}>
-                <Deposits
+              <Paper className={chartHeightPaper}>
+                <TotalTeam
                   readers_cumulative={props.json.readers_cumulative}
+                  goals={props.json.goals}
                   today={
                     props.json.books_per_date[
                       props.json.books_per_date.length - 1
@@ -227,16 +215,16 @@ export default function Dashboard(props) {
               .sort((a, b) => (a.reader > b.reader ? 1 : -1))
               .map((item) => (
                 <Grid item xs={12} md={4} lg={3}>
-                  <Paper className={fixedHeightPaper}>
-                    <ReaderCard reader_info={item} colors={colors} />
+                  <Paper className={readerHeightPaper}>
+                    <ReaderCard reader_info={item} goals={props.json.goals} />
                   </Paper>
                 </Grid>
               ))}
 
-            {/* Recent Orders */}
+            {/* List_books */}
             <Grid item xs={12}>
               <Paper className={classes.paper}>
-                <Orders books={props.json.books} />
+                <ListBooks books={props.json.books} />
               </Paper>
             </Grid>
           </Grid>

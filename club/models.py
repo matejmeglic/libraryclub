@@ -22,18 +22,18 @@ class Season(models.Model):
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     is_active = models.BooleanField("Aktivna", default=True)
     goal_per_month = models.BooleanField("Knjiga na mesec", default=True)
-    goal_per_month_nu = models.IntegerField(
+    goal_per_month_no = models.IntegerField(
         "Številko knjig na mesec",
-        validators=[MaxValueValidator(120)],
+        validators=[MaxValueValidator(10)],
         help_text="1",
         default=0,
         blank=True,
         null=True,
     )
     goal_per_season = models.BooleanField("Številko knjig na sezono", default=False)
-    goal_per_season_nu = models.PositiveIntegerField(
+    goal_per_season_no = models.PositiveIntegerField(
         "Število knjig na sezono",
-        validators=[MaxValueValidator(10)],
+        validators=[MaxValueValidator(500)],
         help_text="100",
         default=0,
         blank=True,
@@ -66,6 +66,9 @@ class Book(models.Model):
     reader = models.ForeignKey(Reader, on_delete=models.CASCADE)
     name = models.CharField("Naslov knjige", max_length=80, null=False)
     author = models.CharField("Avtor", max_length=80, null=False)
+    pages = models.IntegerField(
+        "Število strani", help_text="298", default=0, blank=False, null=False
+    )
     description = models.TextField("Opis knjige", max_length=300, blank=True)
     date_read = models.DateField("Datum", null=False)
 
