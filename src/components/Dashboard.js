@@ -115,7 +115,7 @@ const useStyles = makeStyles((theme) => ({
     height: 480,
   },
   chartHeight: {
-    height: 360,
+    height: 380,
   },
 }));
 

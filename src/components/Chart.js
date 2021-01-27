@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@material-ui/core";
 import {
   LineChart,
@@ -64,8 +64,22 @@ export default function Chart(props) {
   const [showResults, setShowResults] = React.useState(false);
   const onClick = () => setShowResults(!showResults);
 
+  const [showLegend, setShowLegend] = useState(true);
+
+  useEffect(() => {
+    function handleResize() {
+      if (window.innerWidth < 900 && showLegend) {
+        setShowLegend(false);
+      } else if (window.innerWidth >= 900 && showLegend === false) {
+        setShowLegend(true);
+      }
+    }
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [showLegend]);
+
   return (
-    <React.Fragment style={{ height: "400px" }}>
+    <React.Fragment>
       <Title>
         Prebrane knjige{"   "}
         {props.goals.goal_per_season === true ? (
@@ -84,7 +98,7 @@ export default function Chart(props) {
       <ResponsiveContainer>
         <LineChart
           width={500}
-          height={400}
+          height={showLegend ? 350 : 400}
           data={props.books_daily}
           margin={{
             top: 5,
@@ -96,7 +110,7 @@ export default function Chart(props) {
           <XAxis dataKey="date" />
           <YAxis />
           <Tooltip />
-          <Legend />
+          {showLegend ? <Legend /> : ""}
           <Label />
           {list}
           {showResults ? (
