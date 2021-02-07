@@ -321,15 +321,12 @@ export default function Dashboard(props) {
                   readers={[]}
                   goals={props.json.goals}
                   dataKey="date"
-                  title="Cilj sezone"
+                  title="Mesečni cilj skupaj"
                   monthy={true}
                   monthly_gray={["Mesečni cilj sezone", "#d4d4d4", 1]}
                   button={false}
                   show_season_lines={true}
-                  season_lines={[
-                    ["Cilj sezone", "#82ffa1", 4],
-                    ["Skupaj", "#3f51b5", 5],
-                  ]}
+                  season_lines={[["Skupaj", "#3f51b5", 5]]}
                 />
               </Paper>
             </Grid>
