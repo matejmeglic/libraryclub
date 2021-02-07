@@ -1,19 +1,38 @@
+from os import read
 from django.shortcuts import render
 from .models import Book, Reader, Season, Team
 from datetime import date, timedelta
 import math
 
 
-def index(request):
-    # get data from db
-    query_team = "Kernovi"
-    active_season = 2021
-    query_season = Season.objects.filter(team__team_name=query_team).filter(
-        season_name=active_season
-    )
-    query_readers = Reader.objects.filter(
-        team__team_name__contains=query_team
-    ).distinct()
+def index(request, **kwargs):
+
+    # get URL params and kwargs for team and season
+    if "team" in kwargs:
+        query_team = kwargs["team"]
+    else:
+        query_team = "Kernovi"  # hardcoded first page
+
+    if "season" in kwargs:
+        if kwargs["season"] == "ActiveSeason":
+            query_season = Season.objects.filter(team__team_name=query_team).filter(
+                is_active=True
+            )
+        else:
+            query_season = Season.objects.filter(team__team_name=query_team).filter(
+                season_name=kwargs["season"]
+            )
+    else:
+        query_season = Season.objects.filter(team__team_name=query_team).filter(
+            is_active=True
+        )
+
+    # show error page if wrong team, season or team with no active seasons is selected
+    if len(query_season) == 0:
+        return render(request, "wrong_team.html", {"context": "context"})
+
+    # get readers and books
+    query_readers = Reader.objects.filter(team__team_name=query_team).distinct()
     query_books = (
         Book.objects.filter(reader__in=query_readers)
         .filter(
@@ -101,6 +120,7 @@ def index(request):
         books.append(
             {
                 "date_read": book.date_read,
+                "month_read": months_dict[book.date_read.month],
                 "id": book.id,
                 "reader_id": book.reader_id,
                 "reader": str(book.reader),
@@ -248,8 +268,8 @@ def index(request):
     date_counter = 0
     books_per_date = []
     cumulative_sum = 0
+    cumulative_sum_pages = 0
     readers_start_date = []
-    sum_daily = []
     for reader in readers_dict:  # get diff for start date "null"
         readers_start_date.append(
             [
@@ -257,28 +277,38 @@ def index(request):
                 (reader.get("started_reading") - date_book_current).days,
             ]
         )
+
+    reader_books_monthly_goal = []  # outside of while for monthly goal calculation
     while date_counter <= date_diff:
         book_date = []
         book_counter = 0
+        sum_pages_daily = 0
+        day_in_month = date_book_current.day
         for book in books:
             if date_book_current == book.get("date_read"):
                 book_date.append(book)
                 book_counter += 1
                 cumulative_sum += 1
+                cumulative_sum_pages += book.get("pages")
+                sum_pages_daily += book.get("pages")
         books_per_date.append(
             {
                 "day": date_counter,
                 "date": date_book_current,
                 "sum_today": book_counter,
                 "sum_cumulative": cumulative_sum,
+                "sum_pages": sum_pages_daily,
                 "books": book_date,
-                "reader_books": [],
-                "reader_books_cumulative": [],
             }
         )
         # readers per-day rendering
         reader_books = []
         reader_books_cumulative = []
+        reader_pages = []
+        reader_pages_distinct = []
+        reader_pages_cumulative = []
+        reader_pages_avg = []
+        reader_books_monthly_goal_sum = []
         for reader in readers_dict:
             for start_date in readers_start_date:
                 if reader.get("reader") == start_date[0]:
@@ -286,18 +316,40 @@ def index(request):
                         ""  # if user didn't start reading yet, don't show anything
                     else:
                         count_reader_books = 0
+                        count_reader_pages = 0
                         for book in book_date:
                             if book.get("reader") == reader.get("reader"):
                                 count_reader_books += 1
+                                count_reader_pages += book.get("pages")
+                        for reader_cum in readers_cumulative:
+                            if reader.get("reader") == reader_cum.get("reader"):
+                                reader_books_monthly_goal_sum.append(
+                                    [reader.get("reader"), 0]
+                                )
+
                         # don't send reader's data if he has no active books in this season
                         for reader_cum in readers_cumulative:
                             if reader.get("reader") == reader_cum.get("reader"):
                                 reader_books.append(
                                     [reader.get("reader"), count_reader_books]
                                 )
-                        # cumulative
+                                for reader_monthly in reader_books_monthly_goal_sum:
+                                    if reader.get("reader") == reader_monthly[0]:
+                                        reader_monthly[1] = (
+                                            reader_monthly[1] + count_reader_books
+                                        )
+                                reader_pages.append(
+                                    [reader.get("reader"), count_reader_pages]
+                                )
+                                if count_reader_books > 0:
+                                    reader_pages_distinct.append(
+                                        [reader.get("reader"), count_reader_pages]
+                                    )
 
+                        # cumulative
                         sum_books = 0
+                        sum_pages = 0
+
                         if len(books_per_date) < 1:
                             ""
                         elif len(books_per_date) < 2:
@@ -309,19 +361,89 @@ def index(request):
                                 if reader.get("reader") == book_pd[0]:
                                     sum_books = book_pd[1] + count_reader_books
 
+                            for book_pd in books_per_date[len(books_per_date) - 2][
+                                "reader_pages_cumulative"
+                            ]:
+                                if reader.get("reader") == book_pd[0]:
+                                    sum_pages = book_pd[1] + count_reader_pages
+
                             # don't send reader's data if he has no active books in this season
                             for reader_cum in readers_cumulative:
                                 if reader.get("reader") == reader_cum.get("reader"):
                                     reader_books_cumulative.append(
                                         [reader.get("reader"), sum_books]
                                     )
+                                    reader_pages_cumulative.append(
+                                        [reader.get("reader"), sum_pages]
+                                    )
+                                    if sum_books == 0:
+                                        ""
+                                    else:
+                                        reader_pages_avg.append(
+                                            [
+                                                reader.get("reader"),
+                                                round(sum_pages / sum_books, 2),
+                                            ]
+                                        )
+
+        # calculate monthly goals
+        if day_in_month == 1:
+            reader_books_monthly_goal = []
+
+        if len(reader_books_monthly_goal) == 0:
+            reader_books_monthly_goal = reader_books_monthly_goal_sum
+
+        else:
+            monthly_goal_new = []
+            for reader in reader_books_monthly_goal_sum:
+                for reader_monthly in reader_books_monthly_goal:
+
+                    if reader[0] == reader_monthly[0]:
+                        real_reader = reader_monthly[0]
+                        books_new = reader[1] + reader_monthly[1]
+                        if books_new <= goals.get("goal_per_month_no"):
+                            monthly_goal_new.append([reader[0], books_new])
+                        else:
+                            monthly_goal_new.append(
+                                [reader[0], goals.get("goal_per_month_no")]
+                            )
+
+                if reader[0] != real_reader:
+                    monthly_goal_new.append([reader[0], reader[1]])
+
+            # sum
+            monthly_goal_sum = 0
+            for reader in monthly_goal_new:
+                monthly_goal_sum += reader[1]
+            monthly_goal_new.append(["Skupaj", monthly_goal_sum])
+
+            reader_books_monthly_goal = monthly_goal_new
+
         # sum line
         reader_books_cumulative.append(["Skupaj", cumulative_sum])
+        reader_pages_cumulative.append(["Skupaj strani", cumulative_sum_pages])
+        if cumulative_sum == 0:
+            avg_pages = 0
+        else:
+            avg_pages = round(cumulative_sum_pages / cumulative_sum, 2)
+        reader_pages_avg.append(["Skupaj strani povprečje", avg_pages])
 
+        # add to books_per_date 1d object - base level
         books_per_date[len(books_per_date) - 1]["reader_books"] = reader_books
         books_per_date[len(books_per_date) - 1][
             "reader_books_cumulative"
         ] = reader_books_cumulative
+        books_per_date[len(books_per_date) - 1]["reader_pages"] = reader_pages
+        books_per_date[len(books_per_date) - 1][
+            "reader_pages_cumulative"
+        ] = reader_pages_cumulative
+        books_per_date[len(books_per_date) - 1]["reader_pages_avg"] = reader_pages_avg
+        books_per_date[len(books_per_date) - 1][
+            "reader_pages_distinct"
+        ] = reader_pages_distinct
+        books_per_date[len(books_per_date) - 1][
+            "reader_books_monthly_goal"
+        ] = reader_books_monthly_goal
 
         date_counter += 1
         date_book_current += timedelta(days=1)
@@ -335,34 +457,87 @@ def index(request):
         days_of_season = len(books_per_date)
         day_counter = 0
         starting_month = books_per_date[0].get("date").month
-        print(starting_month)
         month_increase = 1
         while day_counter < days_of_season:
             if starting_month != books_per_date[day_counter].get("date").month:
                 month_increase += 1
                 starting_month = books_per_date[day_counter].get("date").month
-                print("new starting month " + str(starting_month))
-            books_per_date[day_counter].get("reader_books_cumulative").append(
-                [
-                    "Mesečni cilj",
-                    active_readers * goals.get("goal_per_month_no") * month_increase,
-                ]
-            )
             books_per_date[day_counter].get("reader_books_cumulative").append(
                 [
                     "Cilj sezone",
                     goals.get("goal_per_season_no"),
                 ]
             )
+            books_per_date[day_counter].get("reader_books_cumulative").append(
+                [
+                    "Mesečni cilj sezone",
+                    active_readers * goals.get("goal_per_month_no") * month_increase,
+                ]
+            )
+            books_per_date[day_counter].get("reader_books_cumulative").append(
+                [
+                    "Mesečni cilj bralec",
+                    goals.get("goal_per_month_no"),
+                ]
+            )
+            books_per_date[day_counter].get("reader_books_cumulative").append(
+                [
+                    "Mesečni cilj vsi bralci",
+                    active_readers * goals.get("goal_per_month_no"),
+                ]
+            )
+            # watch out, repeated for two sections in json
+            books_per_date[day_counter].get("reader_books_monthly_goal").append(
+                [
+                    "Mesečni cilj sezone",
+                    active_readers * goals.get("goal_per_month_no") * month_increase,
+                ]
+            )
+            books_per_date[day_counter].get("reader_books_monthly_goal").append(
+                [
+                    "Mesečni cilj bralec",
+                    goals.get("goal_per_month_no"),
+                ]
+            )
+            books_per_date[day_counter].get("reader_books_monthly_goal").append(
+                [
+                    "Mesečni cilj vsi bralci",
+                    active_readers * goals.get("goal_per_month_no"),
+                ]
+            )
             day_counter += 1
 
-    # cumulative books sorted by readers for every day of the season
+    # cumulative books sorted by readers for every day of the season - CONTEXT PREPARATION
     books_daily = []
     for day in books_per_date:
         daily_object = {"date": day.get("date")}
         for reader_book in day.get("reader_books_cumulative"):
             daily_object[reader_book[0]] = reader_book[1]
         books_daily.append(daily_object)
+
+    # pages_daily
+    pages_daily = []
+    for day in books_per_date:
+        daily_object = {"date": day.get("date")}
+        for reader_book in day.get("reader_pages_cumulative"):
+            daily_object[reader_book[0]] = reader_book[1]
+        pages_daily.append(daily_object)
+
+    # avg_pages_daily
+    avg_pages_daily = []
+    for day in books_per_date:
+        daily_object = {"date": day.get("date")}
+        for reader_book in day.get("reader_pages_avg"):
+            daily_object[reader_book[0]] = reader_book[1]
+        avg_pages_daily.append(daily_object)
+
+    # monthly_goal
+    monthly_goal_daily = []
+    for day in books_per_date:
+        daily_object = {"date": day.get("date")}
+        for reader_book in day.get("reader_books_monthly_goal"):
+            daily_object[reader_book[0]] = reader_book[1]
+        monthly_goal_daily.append(daily_object)
 
     # pack all data to context for json extraction on FE
     all_data = {
@@ -372,6 +547,9 @@ def index(request):
         "readers_cumulative": readers_cumulative,
         "readers_dict": readers_dict,
         "books_daily": books_daily,
+        "pages_daily": pages_daily,
+        "pages_daily_avg": avg_pages_daily,
+        "monthly_goal_daily": monthly_goal_daily,
         "goals": goals,
     }
     context = {"all_data": all_data}

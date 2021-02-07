@@ -20,7 +20,7 @@ class ReaderAdmin(admin.ModelAdmin):
 @admin.register(models.Book)
 class BookAdmin(admin.ModelAdmin):
     list_display = ("date_read", "reader", "name", "author")
-    ordering = ("date_read",)
+    ordering = ("-date_read",)
 
 
 @admin.register(models.Reader)

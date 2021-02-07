@@ -16,7 +16,9 @@ import Paper from "@material-ui/core/Paper";
 import Link from "@material-ui/core/Link";
 import MenuIcon from "@material-ui/icons/Menu";
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import TextField from "@material-ui/core/TextField";
 import { mainListItems } from "./listItems";
+import { Button } from "@material-ui/core";
 import Chart from "./Chart";
 import TotalTeam from "./Total_team";
 import ListBooks from "./List_books";
@@ -33,6 +35,20 @@ function Copyright() {
       {"."}
     </Typography>
   );
+}
+
+function RenderNewTeam() {
+  let team = document.getElementById("team").value;
+  let season = document.getElementById("season").value;
+
+  if ((team === "" && season === "") || (team === "" && season !== "")) {
+    return window.open(`/`, "_self");
+  } else if (team !== "" && season === "") {
+    season = "ActiveSeason";
+    return window.open(`/${team}/${season}`, "_self");
+  } else if (team !== "" && season !== "") {
+    return window.open(`/${team}/${season}`, "_self");
+  }
 }
 
 const drawerWidth = 240;
@@ -91,6 +107,9 @@ const useStyles = makeStyles((theme) => ({
       duration: theme.transitions.duration.leavingScreen,
     }),
     width: theme.spacing(7),
+    [theme.breakpoints.up("xs")]: {
+      width: theme.spacing(0),
+    },
     [theme.breakpoints.up("sm")]: {
       width: theme.spacing(9),
     },
@@ -112,7 +131,7 @@ const useStyles = makeStyles((theme) => ({
     flexDirection: "column",
   },
   readerHeight: {
-    height: 480,
+    height: 500,
   },
   chartHeight: {
     height: 380,
@@ -183,15 +202,47 @@ export default function Dashboard(props) {
       <main className={classes.content}>
         <div className={classes.appBarSpacer} />
         <Container maxWidth="lg" className={classes.container}>
+          <form className={classes.root} noValidate autoComplete="off">
+            <TextField
+              id="team"
+              size="small"
+              label="Ekipa"
+              style={{ marginLeft: "10px" }}
+            />{" "}
+            <TextField
+              id="season"
+              size="small"
+              label="Sezona"
+              style={{ marginLeft: "10px" }}
+            />
+            <Button
+              variant="outlined"
+              size="small"
+              style={{ marginLeft: "10px", marginRight: "10px" }}
+              onClick={RenderNewTeam}
+            >
+              :)
+            </Button>
+          </form>
           <Grid container spacing={3}>
             {/* Chart */}
             <Grid item xs={12} md={8} lg={9}>
               <Paper className={chartHeightPaper}>
                 <Chart
-                  books_per_date={props.json.books_per_date}
-                  books_daily={props.json.books_daily}
-                  readers_cumulative={props.json.readers_cumulative}
+                  data={props.json.books_daily}
+                  readers={props.json.readers_cumulative}
                   goals={props.json.goals}
+                  dataKey="date"
+                  title="Prebrane knjige"
+                  monthy={true}
+                  monthly_gray={["Mesečni cilj sezone", "#d4d4d4", 1]}
+                  button={true}
+                  button_text="Vse prebrane knjige"
+                  show_season_lines={false}
+                  season_lines={[
+                    ["Cilj sezone", "#82ffa1", 4],
+                    ["Skupaj", "#3f51b5", 5],
+                  ]}
                 />
               </Paper>
             </Grid>
@@ -209,8 +260,80 @@ export default function Dashboard(props) {
                 />
               </Paper>
             </Grid>
-
-            {/* Readers Card */}
+            {/* ChartPages */}
+            <Grid item xs={12} md={6} lg={6}>
+              <Paper className={chartHeightPaper}>
+                <Chart
+                  data={props.json.pages_daily}
+                  readers={props.json.readers_cumulative}
+                  goals={props.json.goals}
+                  dataKey="date"
+                  title="Prebrane strani"
+                  monthy={false}
+                  button={true}
+                  button_text="Vse prebrane strani"
+                  show_season_lines={false}
+                  season_lines={[["Skupaj strani", "#3f51b5", 5]]}
+                />
+              </Paper>
+            </Grid>
+            {/* ChartAverage */}
+            <Grid item xs={12} md={6} lg={6}>
+              <Paper className={chartHeightPaper}>
+                <Chart
+                  data={props.json.pages_daily_avg}
+                  readers={props.json.readers_cumulative}
+                  goals={props.json.goals}
+                  dataKey="date"
+                  title="Povprečje prebranih strani"
+                  monthy={false}
+                  button={true}
+                  button_text="Skupno povprečje"
+                  show_season_lines={false}
+                  season_lines={[["Skupaj strani povprečje", "#3f51b5", 5]]}
+                />
+              </Paper>
+            </Grid>
+            {/* ChartMonthlyGoal optional*/}
+            {props.json.goals.goal_per_month === true ? (
+              <Grid item xs={12} md={6} lg={6}>
+                <Paper className={chartHeightPaper}>
+                  <Chart
+                    data={props.json.monthly_goal_daily}
+                    readers={props.json.readers_cumulative}
+                    goals={props.json.goals}
+                    dataKey="date"
+                    title="Mesečni cilj"
+                    monthy={true}
+                    monthly_gray={["Mesečni cilj vsi bralci", "#d4d4d4", 1]}
+                    button={false}
+                    show_season_lines={true}
+                    season_lines={[["Skupaj", "#3f51b5", 5]]}
+                  />
+                </Paper>
+              </Grid>
+            ) : null}
+            {/* ChartSeasonGoal optional*/}
+            <Grid item xs={12} md={6} lg={6}>
+              <Paper className={chartHeightPaper}>
+                <Chart
+                  data={props.json.books_daily}
+                  readers={[]}
+                  goals={props.json.goals}
+                  dataKey="date"
+                  title="Cilj sezone"
+                  monthy={true}
+                  monthly_gray={["Mesečni cilj sezone", "#d4d4d4", 1]}
+                  button={false}
+                  show_season_lines={true}
+                  season_lines={[
+                    ["Cilj sezone", "#82ffa1", 4],
+                    ["Skupaj", "#3f51b5", 5],
+                  ]}
+                />
+              </Paper>
+            </Grid>
+            {/* Readers Cards */}
             {props.json.readers_cumulative
               .sort((a, b) => (a.reader > b.reader ? 1 : -1))
               .map((item) => (

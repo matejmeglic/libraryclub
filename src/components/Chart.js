@@ -15,13 +15,11 @@ import Title from "./Title";
 export default function Chart(props) {
   let readers = [];
   let list = [];
+  let season_lines = [];
 
   // readers lines
-  for (var j = 0; j < props.readers_cumulative.length; j++) {
-    readers.push([
-      props.readers_cumulative[j].reader,
-      [props.readers_cumulative[j].color],
-    ]);
+  for (var j = 0; j < props.readers.length; j++) {
+    readers.push([props.readers[j].reader, [props.readers[j].color]]);
   }
 
   readers
@@ -39,29 +37,41 @@ export default function Chart(props) {
       );
     });
 
-  if (props.goals.goal_per_month === true) {
-    list.push(
-      <Line
-        type="monotone"
-        strokeWidth={1}
-        dataKey={"Mesečni cilj"}
-        stroke={"#d4d4d4"}
-        dot={false}
-      />
-    );
+  if (props.monthy === true) {
+    if (props.goals.goal_per_month === true) {
+      list.push(
+        <Line
+          type="monotone"
+          strokeWidth={props.monthly_gray[2]}
+          dataKey={props.monthly_gray[0]}
+          stroke={props.monthly_gray[1]}
+          dot={false}
+        />
+      );
+    }
   }
 
-  list.push(
-    <Line
-      type="monotone"
-      strokeWidth={5}
-      dataKey={"Skupaj"}
-      stroke={"#3f51b5"}
-      dot={false}
-    />
+  props.season_lines.forEach((line) =>
+    season_lines.push(
+      <Line
+        type="monotone"
+        strokeWidth={line[2]}
+        dataKey={line[0]}
+        stroke={line[1]}
+        dot={false}
+      />
+    )
   );
 
-  const [showResults, setShowResults] = React.useState(false);
+  // hack for state
+  let rstate;
+  if (props.show_season_lines === false) {
+    rstate = false;
+  } else {
+    rstate = { showResults: true };
+  }
+
+  const [showResults, setShowResults] = React.useState(rstate);
   const onClick = () => setShowResults(!showResults);
 
   const [showLegend, setShowLegend] = useState(true);
@@ -81,15 +91,16 @@ export default function Chart(props) {
   return (
     <React.Fragment>
       <Title>
-        Prebrane knjige{"   "}
-        {props.goals.goal_per_season === true ? (
+        {props.title}
+        {"   "}
+        {props.button === true ? (
           <Button
             variant="contained"
             width={100}
             style={{ marginLeft: "10px" }}
             onClick={onClick}
           >
-            Cilj sezone
+            {props.button_text}
           </Button>
         ) : (
           ""
@@ -98,8 +109,8 @@ export default function Chart(props) {
       <ResponsiveContainer>
         <LineChart
           width={500}
-          height={showLegend ? 350 : 400}
-          data={props.books_daily}
+          height={showLegend ? 300 : 350}
+          data={props.data}
           margin={{
             top: 5,
             right: 30,
@@ -107,21 +118,13 @@ export default function Chart(props) {
             bottom: 5,
           }}
         >
-          <XAxis dataKey="date" />
+          <XAxis dataKey={props.dataKey} />
           <YAxis />
           <Tooltip />
           {showLegend ? <Legend /> : ""}
           <Label />
           {list}
-          {showResults ? (
-            <Line
-              type="monotone"
-              strokeWidth={4}
-              dataKey={"Cilj sezone"}
-              stroke={"#82ffa1"}
-              dot={false}
-            />
-          ) : null}
+          {showResults ? season_lines : null}
         </LineChart>
       </ResponsiveContainer>
     </React.Fragment>
