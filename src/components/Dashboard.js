@@ -23,20 +23,12 @@ import Chart from "./Chart";
 import TotalTeam from "./Total_team";
 import ListBooks from "./List_books";
 import ReaderCard from "./ReaderCard";
+import Title from "./Title";
+import Katja from "../assets/Katja_200.png";
+import Tjasa from "../assets/Tjasa_200.png";
+import Matej from "../assets/Matej_200.png";
 
-function Copyright() {
-  return (
-    <Typography variant="body2" color="textSecondary" align="center">
-      {"Vse pravice pridržane © "}
-      <Link color="inherit" href="https://matejmeglic.com">
-        Bookiranje
-      </Link>{" "}
-      {new Date().getFullYear()}
-      {"."}
-    </Typography>
-  );
-}
-
+// concatenate URL
 function RenderNewTeam() {
   let team = document.getElementById("team").value;
   let season = document.getElementById("season").value;
@@ -136,6 +128,17 @@ const useStyles = makeStyles((theme) => ({
   chartHeight: {
     height: 380,
   },
+  badgeColor: {
+    fill: "#82ffa1",
+  },
+  authorPic: {
+    borderRadius: "50%",
+    width: "50%",
+    height: "auto",
+  },
+  footerText: {
+    color: "#ffffff",
+  },
 }));
 
 export default function Dashboard(props) {
@@ -149,6 +152,8 @@ export default function Dashboard(props) {
   };
   const readerHeightPaper = clsx(classes.paper, classes.readerHeight);
   const chartHeightPaper = clsx(classes.paper, classes.chartHeight);
+  const authorPic = clsx(classes.paper, classes.authorPic);
+  const footerText = clsx(classes.paper, classes.footerText);
 
   return (
     <div className={classes.root}>
@@ -260,6 +265,16 @@ export default function Dashboard(props) {
                 />
               </Paper>
             </Grid>
+            {/* Readers Cards */}
+            {props.json.readers_cumulative
+              .sort((a, b) => (a.reader > b.reader ? 1 : -1))
+              .map((item) => (
+                <Grid item xs={12} md={4} lg={3}>
+                  <Paper className={readerHeightPaper}>
+                    <ReaderCard reader_info={item} goals={props.json.goals} />
+                  </Paper>
+                </Grid>
+              ))}
             {/* ChartPages */}
             <Grid item xs={12} md={6} lg={6}>
               <Paper className={chartHeightPaper}>
@@ -330,16 +345,6 @@ export default function Dashboard(props) {
                 />
               </Paper>
             </Grid>
-            {/* Readers Cards */}
-            {props.json.readers_cumulative
-              .sort((a, b) => (a.reader > b.reader ? 1 : -1))
-              .map((item) => (
-                <Grid item xs={12} md={4} lg={3}>
-                  <Paper className={readerHeightPaper}>
-                    <ReaderCard reader_info={item} goals={props.json.goals} />
-                  </Paper>
-                </Grid>
-              ))}
 
             {/* List_books */}
             <Grid item xs={12}>
@@ -348,10 +353,212 @@ export default function Dashboard(props) {
               </Paper>
             </Grid>
           </Grid>
-          <Box pt={4}>
-            <Copyright />
-          </Box>
         </Container>
+        {/* Footer */}
+        <div
+          style={{
+            background: "linear-gradient(to right bottom, #430089, #82ffa1)",
+          }}
+        >
+          <br />
+          <Container maxWidth="lg" className={classes.container}>
+            <Grid container justify="center" spacing={3}>
+              <br />
+              <Grid item xs={11} md={6}>
+                <Typography component="h2" variant="h6" className={footerText}>
+                  Kaj je Bookiranje?
+                </Typography>
+                <Typography
+                  className={footerText}
+                  align="justify"
+                  variant="body1"
+                  component="p"
+                >
+                  Božič 2020 smo ob poplavi slaščic preživeli v družinskem
+                  mehurčku. Ob poplavi slabih idej za preživljanje prostega časa
+                  se je rodila zasebna Facebook skupina Bookiranje z izzivom, da
+                  vsak družinski član prebere eno knjigo na mesec. Našli smo
+                  zagon in čez novo leto komaj govorili drug z drugim. Pritisk
+                  skupnosti "Peer pressure" je naredil svoje in kaj kmalu se je
+                  začelo primerjanje knjig, izmenjava mnenj in priporočil. Kmalu
+                  za tem se je rodila aplikacija Bookiranje, ki skupinam omogoča
+                  enostaven vnos in vpogled v skupne bralne cilje, osnovne
+                  bralne karakteristike, ter jih pri branju vzpodbuja na
+                  netekmovalen način. Pri nas se netekmovalnost seveda ni izšla,
+                  saj smo že prvi mesec namesto osmih prebrali 24 knjig. :)
+                </Typography>
+                <Typography component="h2" variant="h6" className={footerText}>
+                  Kaj Bookiranje omogoča?
+                </Typography>
+                <Typography
+                  className={footerText}
+                  align="justify"
+                  variant="body1"
+                  component="p"
+                >
+                  Aplikacija Bookiranje omogoča enostavno administracijo
+                  skupine, določanje bralnih sezon, ciljev sezone (skupno
+                  število prebranih knjig na skupino), ter mesečnih ciljev
+                  (število prebranih knjig na mesec na člana skupine). Ob
+                  vestnem zbiranju in enostavnem vnosu podatkov so podatki
+                  ažurni, ter omogočajo vpogled v bralne navadi članov. Namen
+                  aplikacije ni krepljenje tekmovalnosti temveč neinvazivno
+                  spodbujanje rednega branja ter sodelovanja proti skupnemu
+                  cilju.
+                </Typography>
+              </Grid>
+              <Grid item xs={9} md={6}>
+                <Typography component="h2" variant="h6" className={footerText}>
+                  GDPR? Piškotki?
+                </Typography>
+                <Typography
+                  className={footerText}
+                  align="justify"
+                  variant="body1"
+                  component="p"
+                >
+                  Bookiranje uporabniki uporabljajo prostovoljno in samostojno
+                  vnašajo podatke o prebranih knjigah. Avtorji predlagamo, da
+                  člani skupine ne uporabljajo polnih imen, v kolikor jim je
+                  anonimnost pomembna (Primer MatejM namesto Matej Megilč).
+                  Avtorji strani za vsebino znotraj posamezna skupine ne
+                  odgovarjajo, lahko pa za potrebe nadalnjega razvoja in
+                  raziskav uporabljajo vnesene bralne statistike. Do podatkov o
+                  skupini lahko uporabnik dostopa le, če pozna ime skupine.
+                  Stran ne uporablja piškotkov, avtorji pa jih imamo še posebej
+                  radi. :)
+                </Typography>
+                <Typography component="h2" variant="h6" className={footerText}>
+                  Kako lahko začnem Bookirati
+                </Typography>
+                <Typography
+                  className={footerText}
+                  align="justify"
+                  variant="body1"
+                  component="p"
+                >
+                  V beta fazi nove skupine sprejemamo preko e-mail naslova
+                  matej@matejmeglic.com. Po spoznavnem emailu vam pripravimo
+                  prijavne podatke na nivoju skupine, nastavimo prvo sezono, ter
+                  pošljemo osnovno dokumentacijo, ki vam bo v pomoč pri prvem
+                  vnosu prebranih knjig. Beta dostop pomeni, da bodo vaša mnenja
+                  slišana ter, da imate možnost aktivno sodelovati pri
+                  dopolnjevanju aplikacije (levi meni je trenutno brez funkcije,
+                  vemo :D ).
+                </Typography>
+                <Typography component="h2" variant="h6" className={footerText}>
+                  Cena Bookiranja
+                </Typography>
+                <Typography
+                  className={footerText}
+                  align="justify"
+                  variant="body1"
+                  component="p"
+                >
+                  Cena na skupino na sezono znaša 20 eur. V zameno za platformo
+                  nam častite eno knjigo. Vnaprej najlepša hvala.
+                </Typography>
+              </Grid>
+            </Grid>
+            <br />
+            <br />
+            <Grid container justify="center" spacing={3}>
+              <Grid item xs={11} md={3} lg={3}>
+                <div align="center">
+                  <img
+                    src={Matej}
+                    alt="Matej Meglič"
+                    className={classes.authorPic}
+                  />
+                  <Title align="center">
+                    <Link
+                      className={footerText}
+                      underline="none"
+                      href="https://matejmeglic.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Matej Meglič
+                    </Link>
+                  </Title>
+                </div>
+                <Typography
+                  className={footerText}
+                  align="justify"
+                  variant="body1"
+                  component="p"
+                >
+                  Ljubitelj analize podatkov, razvoja produkta in hobby-art
+                  programer, ki v težavah vidi izzive, v branju pa izgubljeno
+                  umetnost.
+                </Typography>
+              </Grid>
+              <Grid item xs={11} md={3} lg={3}>
+                <div align="center">
+                  <img
+                    src={Katja}
+                    alt="Katja Kern"
+                    className={classes.authorPic}
+                  />
+                  <Title className={footerText} align="center">
+                    <Link underline="none" className={footerText} href="#">
+                      Katja Kern
+                    </Link>
+                  </Title>
+                </div>
+                <Typography
+                  className={footerText}
+                  align="justify"
+                  variant="body1"
+                  component="p"
+                >
+                  Idejna vodja projekta, zagrizena zagovornica uporabniške
+                  izkušnje, zanesenjaška ustvarjalka in ljubiteljica vsega
+                  lepega. Pogosto poseže tudi po poeziji.
+                </Typography>
+              </Grid>
+              <Grid item xs={11} md={3} lg={3}>
+                <div align="center">
+                  <img
+                    src={Tjasa}
+                    alt="Tjaša Kern"
+                    className={classes.authorPic}
+                  />
+                  <Title align="center">
+                    <Link
+                      underline="none"
+                      className={footerText}
+                      href="https://anomalo.si"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Tjaša Kern
+                    </Link>
+                  </Title>
+                </div>
+                <Typography
+                  className={footerText}
+                  align="justify"
+                  variant="body1"
+                  component="p"
+                >
+                  Ko-vodja projekta, kreatorka vektorskih risb in bloga
+                  Anomalo.si, izpopolnjevalka funkcionalnosti, ter glavna
+                  zagovornica slogana Knjige namesto telefona.
+                </Typography>
+              </Grid>
+            </Grid>
+          </Container>
+          <Box pt={4}>
+            <Typography className={footerText} align="center">
+              <Link color="inherit" href="https://matejmeglic.com">
+                Veselo bookiranje!
+              </Link>{" "}
+              {new Date().getFullYear()}
+            </Typography>
+            <br />
+          </Box>
+        </div>
       </main>
     </div>
   );

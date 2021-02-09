@@ -507,6 +507,57 @@ def index(request, **kwargs):
             )
             day_counter += 1
 
+    # badges insert
+
+    for reader in readers_cumulative:
+        badge_1stbook = 0
+        badge_3books = 0
+        badge_1kpages = 0
+        badge_10kpages = 0
+        badge_6m = 0
+        badge_seasongoal = 0
+
+        if reader["books_read"] > 0:
+            badge_1stbook = 1
+
+        if reader["books_read"] > 2:
+            badge_3books = 1
+
+        if reader["pages_read"] > 999:
+            badge_1kpages = 1
+
+        if reader["pages_read"] > 9999:
+            badge_10kpages = 1
+
+        sixm = num_months - 6
+
+        while sixm > 0:
+            if reader["books_per_reader_month_array"][sixm] > 0:
+                if reader["books_per_reader_month_array"][sixm + 1] > 0:
+                    if reader["books_per_reader_month_array"][sixm + 2] > 0:
+                        if reader["books_per_reader_month_array"][sixm + 3] > 0:
+                            if reader["books_per_reader_month_array"][sixm + 4] > 0:
+                                if reader["books_per_reader_month_array"][sixm + 5] > 0:
+                                    badge_6m = 1
+            sixm -= 1
+
+        season_reader_goal = goals.get("goal_per_month_no") * num_months
+        season_reader_count = 0
+        for read_count in reader["books_per_reader_month_array"]:
+            if read_count >= goals.get("goal_per_month_no"):
+                season_reader_count += 1
+        if season_reader_count >= season_reader_goal:
+            badge_seasongoal = 1
+
+        reader["badges"] = [
+            badge_1stbook,
+            badge_3books,
+            badge_1kpages,
+            badge_10kpages,
+            badge_6m,
+            badge_seasongoal,
+        ]
+
     # cumulative books sorted by readers for every day of the season - CONTEXT PREPARATION
     books_daily = []
     for day in books_per_date:
