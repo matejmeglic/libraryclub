@@ -230,7 +230,7 @@ export default function Dashboard(props) {
             </Button>
           </form>
           <Grid container spacing={3}>
-            {/* Chart */}
+            {/* MainChart */}
             <Grid item xs={12} md={8} lg={9}>
               <Paper className={chartHeightPaper}>
                 <Chart
@@ -239,12 +239,12 @@ export default function Dashboard(props) {
                   goals={props.json.goals}
                   dataKey="date"
                   title="Prebrane knjige"
-                  monthy={true}
-                  monthly_gray={["Mesečni cilj sezone", "#d4d4d4", 1]}
+                  monthy={false}
                   button={true}
-                  button_text="Vse prebrane knjige"
+                  button_text="Prikaži cilje"
                   show_season_lines={false}
                   season_lines={[
+                    ["Mesečni cilj sezone", "#d4d4d4", 1],
                     ["Cilj sezone", "#82ffa1", 4],
                     ["Skupaj", "#3f51b5", 5],
                   ]}
@@ -275,6 +275,8 @@ export default function Dashboard(props) {
                   </Paper>
                 </Grid>
               ))}
+          </Grid>
+          <Grid container spacing={3}>
             {/* ChartPages */}
             <Grid item xs={12} md={6} lg={6}>
               <Paper className={chartHeightPaper}>
@@ -383,7 +385,7 @@ export default function Dashboard(props) {
                   začelo primerjanje knjig, izmenjava mnenj in priporočil. Kmalu
                   za tem se je rodila aplikacija Bookiranje, ki skupinam omogoča
                   enostaven vnos in vpogled v skupne bralne cilje, osnovne
-                  bralne karakteristike, ter jih pri branju vzpodbuja na
+                  bralne karakteristike ter jih pri branju vzpodbuja na
                   netekmovalen način. Pri nas se netekmovalnost seveda ni izšla,
                   saj smo že prvi mesec namesto osmih prebrali 24 knjig. :)
                 </Typography>
@@ -398,11 +400,11 @@ export default function Dashboard(props) {
                 >
                   Aplikacija Bookiranje omogoča enostavno administracijo
                   skupine, določanje bralnih sezon, ciljev sezone (skupno
-                  število prebranih knjig na skupino), ter mesečnih ciljev
+                  število prebranih knjig na skupino) ter mesečnih ciljev
                   (število prebranih knjig na mesec na člana skupine). Ob
                   vestnem zbiranju in enostavnem vnosu podatkov so podatki
-                  ažurni, ter omogočajo vpogled v bralne navadi članov. Namen
-                  aplikacije ni krepljenje tekmovalnosti temveč neinvazivno
+                  ažurni ter omogočajo vpogled v bralne navadi članov. Namen
+                  aplikacije ni krepljenje tekmovalnosti, temveč neinvazivno
                   spodbujanje rednega branja ter sodelovanja proti skupnemu
                   cilju.
                 </Typography>
@@ -420,9 +422,9 @@ export default function Dashboard(props) {
                   Bookiranje uporabniki uporabljajo prostovoljno in samostojno
                   vnašajo podatke o prebranih knjigah. Avtorji predlagamo, da
                   člani skupine ne uporabljajo polnih imen, v kolikor jim je
-                  anonimnost pomembna (Primer MatejM namesto Matej Megilč).
+                  anonimnost pomembna (Primer MatejM namesto Matej Meglič).
                   Avtorji strani za vsebino znotraj posamezna skupine ne
-                  odgovarjajo, lahko pa za potrebe nadalnjega razvoja in
+                  odgovarjajo, lahko pa za potrebe nadaljnjega razvoja in
                   raziskav uporabljajo vnesene bralne statistike. Do podatkov o
                   skupini lahko uporabnik dostopa le, če pozna ime skupine.
                   Stran ne uporablja piškotkov, avtorji pa jih imamo še posebej
@@ -439,10 +441,10 @@ export default function Dashboard(props) {
                 >
                   V beta fazi nove skupine sprejemamo preko e-mail naslova
                   matej@matejmeglic.com. Po spoznavnem emailu vam pripravimo
-                  prijavne podatke na nivoju skupine, nastavimo prvo sezono, ter
+                  prijavne podatke na nivoju skupine, nastavimo prvo sezono ter
                   pošljemo osnovno dokumentacijo, ki vam bo v pomoč pri prvem
                   vnosu prebranih knjig. Beta dostop pomeni, da bodo vaša mnenja
-                  slišana ter, da imate možnost aktivno sodelovati pri
+                  slišana in da imate možnost aktivno sodelovati pri
                   dopolnjevanju aplikacije (levi meni je trenutno brez funkcije,
                   vemo :D ).
                 </Typography>
@@ -455,8 +457,8 @@ export default function Dashboard(props) {
                   variant="body1"
                   component="p"
                 >
-                  Cena na skupino na sezono znaša 20 eur. V zameno za platformo
-                  nam častite eno knjigo. Vnaprej najlepša hvala.
+                  Cena na skupino na sezono znaša 20 eur. Na ceno/podporo glejte
+                  kot da nam v zameno za uporabo Bookiranja častite knjigo.
                 </Typography>
               </Grid>
             </Grid>
@@ -532,7 +534,7 @@ export default function Dashboard(props) {
                       target="_blank"
                       rel="noopener noreferrer"
                     >
-                      Tjaša Kern
+                      Tjaša Buh
                     </Link>
                   </Title>
                 </div>
@@ -543,7 +545,7 @@ export default function Dashboard(props) {
                   component="p"
                 >
                   Ko-vodja projekta, kreatorka vektorskih risb in bloga
-                  Anomalo.si, izpopolnjevalka funkcionalnosti, ter glavna
+                  Anomalo.si, izpopolnjevalka funkcionalnosti ter glavna
                   zagovornica slogana Knjige namesto telefona.
                 </Typography>
               </Grid>
