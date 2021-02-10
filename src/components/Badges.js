@@ -1,8 +1,8 @@
 import React from "react";
 import clsx from "clsx";
-import { makeStyles } from "@material-ui/core/styles";
+import { withStyles, makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
-import parse from "html-react-parser";
+import { Tooltip } from "@material-ui/core";
 
 // badges
 import { ReactComponent as SVGthreeBooks } from "../assets/3knjigenamesec.svg";
@@ -12,17 +12,17 @@ import { ReactComponent as SVG1000pages } from "../assets/1kprebranihstrani.svg"
 import { ReactComponent as SVGseasongoal } from "../assets/ciljsezone.svg";
 import { ReactComponent as SVGfirstbook } from "../assets/mojaprvaknjiga.svg";
 
+const LightTooltip = withStyles((theme) => ({
+  tooltip: {
+    backgroundColor: theme.palette.common.white,
+    color: "rgba(0, 0, 0, 0.87)",
+    boxShadow: theme.shadows[1],
+    fontSize: 14,
+  },
+}))(Tooltip);
+
 export default function Badges(props) {
   const badges = props.badges;
-
-  const badgesComponents = [
-    "SVGthreeBooks",
-    "SVGsixmonths",
-    "SVG10kpages",
-    "SVG1000pages",
-    "SVGseasongoal",
-    "SVGfirstbook",
-  ];
 
   const useStyles = makeStyles((theme) => ({
     badgeColor: {
@@ -50,34 +50,46 @@ export default function Badges(props) {
       <br /> <br />
       <Grid container spacing={1} align="center" className={gridHeight}>
         <Grid item xs={6}>
-          <SVGfirstbook
-            className={badges[0] === 0 ? badgeColor : activeBadgeColor}
-          />
+          <LightTooltip title="Prva prebrana knjiga v sezoni">
+            <SVGfirstbook
+              className={badges[0] === 0 ? badgeColor : activeBadgeColor}
+            />
+          </LightTooltip>
         </Grid>
         <Grid item xs={6}>
-          <SVGthreeBooks
-            className={badges[1] === 0 ? badgeColor : activeBadgeColor}
-          />
+          <LightTooltip title="Tri prebrane knjige">
+            <SVGthreeBooks
+              className={badges[1] === 0 ? badgeColor : activeBadgeColor}
+            />
+          </LightTooltip>
         </Grid>
         <Grid item xs={6}>
-          <SVG1000pages
-            className={badges[2] === 0 ? badgeColor : activeBadgeColor}
-          />
+          <LightTooltip title="Prebranih 1000 strani">
+            <SVG1000pages
+              className={badges[2] === 0 ? badgeColor : activeBadgeColor}
+            />
+          </LightTooltip>
         </Grid>
         <Grid item xs={6}>
-          <SVG10kpages
-            className={badges[3] === 0 ? badgeColor : activeBadgeColor}
-          />
+          <LightTooltip title="Prebranih 10.000 strani">
+            <SVG10kpages
+              className={badges[3] === 0 ? badgeColor : activeBadgeColor}
+            />
+          </LightTooltip>
         </Grid>
         <Grid item xs={6}>
-          <SVGsixmonths
-            className={badges[4] === 0 ? badgeColor : activeBadgeColor}
-          />
+          <LightTooltip title="6 zaporednih mesecev s prebrano knjigo">
+            <SVGsixmonths
+              className={badges[4] === 0 ? badgeColor : activeBadgeColor}
+            />
+          </LightTooltip>
         </Grid>
         <Grid item xs={6}>
-          <SVGseasongoal
-            className={badges[5] === 0 ? badgeColor : activeBadgeColor}
-          />
+          <LightTooltip title="Sezonski mesečni cilj izpolnjen">
+            <SVGseasongoal
+              className={badges[5] === 0 ? badgeColor : activeBadgeColor}
+            />
+          </LightTooltip>
         </Grid>
       </Grid>
     </React.Fragment>

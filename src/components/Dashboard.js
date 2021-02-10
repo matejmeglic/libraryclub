@@ -409,7 +409,7 @@ export default function Dashboard(props) {
                   cilju.
                 </Typography>
               </Grid>
-              <Grid item xs={9} md={6}>
+              <Grid item xs={11} md={6}>
                 <Typography component="h2" variant="h6" className={footerText}>
                   GDPR? Piškotki?
                 </Typography>
@@ -439,14 +439,14 @@ export default function Dashboard(props) {
                   variant="body1"
                   component="p"
                 >
-                  V beta fazi nove skupine sprejemamo preko e-mail naslova
-                  matej@matejmeglic.com. Po spoznavnem emailu vam pripravimo
-                  prijavne podatke na nivoju skupine, nastavimo prvo sezono ter
-                  pošljemo osnovno dokumentacijo, ki vam bo v pomoč pri prvem
-                  vnosu prebranih knjig. Beta dostop pomeni, da bodo vaša mnenja
-                  slišana in da imate možnost aktivno sodelovati pri
-                  dopolnjevanju aplikacije (levi meni je trenutno brez funkcije,
-                  vemo :D ).
+                  V beta fazi nove skupine sprejemamo preko plačilnega gumba na
+                  dnu strani ali preko matej@matejmeglic.com. Po prejetem
+                  plačilu vam pripravimo prijavne podatke na nivoju skupine,
+                  nastavimo prvo sezono ter pošljemo osnovno dokumentacijo, ki
+                  vam bo v pomoč pri prvem vnosu prebranih knjig. Beta dostop
+                  pomeni, da bodo vaša mnenja slišana in da imate možnost
+                  aktivno sodelovati pri dopolnjevanju aplikacije (levi meni je
+                  trenutno brez funkcije, vemo :D ).
                 </Typography>
                 <Typography component="h2" variant="h6" className={footerText}>
                   Cena Bookiranja
@@ -457,8 +457,9 @@ export default function Dashboard(props) {
                   variant="body1"
                   component="p"
                 >
-                  Cena na skupino na sezono znaša 20 eur. Na ceno/podporo glejte
-                  kot da nam v zameno za uporabo Bookiranja častite knjigo.
+                  Cena na skupino na sezono znaša 20 EUR +DDV. Na ceno/podporo
+                  glejte kot da nam v zameno za uporabo Bookiranja častite
+                  knjigo.
                 </Typography>
               </Grid>
             </Grid>
@@ -553,6 +554,41 @@ export default function Dashboard(props) {
           </Container>
           <Box pt={4}>
             <Typography className={footerText} align="center">
+              <a
+                href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=C7RDUMHNRMR28&source=url"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <form
+                  action="https://www.paypal.com/donate"
+                  method="post"
+                  target="_top"
+                >
+                  <input
+                    type="hidden"
+                    name="business"
+                    value="donmatejo@gmail.com"
+                  />
+                  <input type="hidden" name="item_name" value="Bookiranje" />
+                  <input type="hidden" name="currency_code" value="EUR" />
+                  <input type="hidden" name="amount" value="24.4" />
+                  <input
+                    type="image"
+                    src="https://www.paypalobjects.com/en_US/i/btn/btn_donate_LG.gif"
+                    border="0"
+                    name="submit"
+                    title="PayPal - The safer, easier way to pay online!"
+                    alt="Donate with PayPal button"
+                  />
+                  <img
+                    alt=""
+                    border="0"
+                    src="https://www.paypal.com/en_SI/i/scr/pixel.gif"
+                    width="1"
+                    height="1"
+                  />
+                </form>
+              </a>
               <Link color="inherit" href="https://matejmeglic.com">
                 Veselo bookiranje!
               </Link>{" "}
