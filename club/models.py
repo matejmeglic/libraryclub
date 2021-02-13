@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MaxValueValidator
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -13,6 +14,11 @@ class Team(models.Model):
 
     def __str__(self):
         return self.team_name
+
+
+class TeamUser(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    team = models.ForeignKey(Team, on_delete=models.CASCADE, blank=True, null=True)
 
 
 class Season(models.Model):
