@@ -111,7 +111,6 @@ def index(request, **kwargs):
             {
                 "reader_id": reader.id,
                 "reader": reader.name,
-                "started_reading": reader.started_reading,
                 "color": reader.color,
             }
         )
@@ -146,10 +145,7 @@ def index(request, **kwargs):
                 if count == 0:
                     previous_date = book.get("date_read")
                     days_from_last_book = (
-                        book.get("date_read")
-                        - reader.get(
-                            "started_reading"
-                        )  # implement started reading date for accurate AVG
+                        book.get("date_read") - query_season[0].season_start
                     ).days
                 else:
                     days_from_last_book = (book.get("date_read") - previous_date).days
@@ -185,6 +181,7 @@ def index(request, **kwargs):
                 "books_read": readers_collection,
             }
         )
+
         # calculate time_avg
         avg_time = 0
         book_counter = 0
@@ -275,7 +272,7 @@ def index(request, **kwargs):
         readers_start_date.append(
             [
                 reader.get("reader"),
-                (reader.get("started_reading") - date_book_current).days,
+                (query_season[0].season_start - date_book_current).days,
             ]
         )
 

@@ -73,7 +73,7 @@ class BookAdmin(admin.ModelAdmin):
             qs = qs.filter(reader__in=readers)
         return qs
 
-    list_display = ("date_read", "reader", "name", "author")
+    list_display = ("date_read", "reader", "name", "author", "genre")
     ordering = ("-date_read",)
 
 
@@ -99,4 +99,4 @@ class ReaderAdmin(admin.ModelAdmin):
 
         return result
 
-    list_display = ("name", "team", "started_reading")
+    list_display = ("name", "team")
