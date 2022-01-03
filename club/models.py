@@ -55,7 +55,8 @@ class Season(models.Model):
 
 
 class Reader(models.Model):
-    name = models.CharField("Ime", max_length=20, null=False)
+    name = models.CharField("Ime na grafu", max_length=20, null=False)
+    full_name = models.CharField("Polno ime", max_length=40, blank=True, null=True)
     team = models.ForeignKey(Team, on_delete=models.CASCADE)
     started_reading = models.DateField("Datum začetka branja", null=False)
     color = models.CharField("Barva", max_length=7, help_text="#3f51b5", null=False)

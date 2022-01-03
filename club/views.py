@@ -71,6 +71,7 @@ def index(request, **kwargs):
         "Nov",
         "Dec",
     ]
+    month_days_dict = [0, 31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     season_months_numbers = []
     season_months_names = []
 
@@ -79,7 +80,7 @@ def index(request, **kwargs):
         season_months_names.append(
             str(months_dict[month.month]) + "-" + str(month.year)
         )
-        month += timedelta(days=30)
+        month += timedelta(days=month_days_dict[month.month])
         month_counter += 1
 
     # goals for the season
