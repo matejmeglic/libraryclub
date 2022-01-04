@@ -23,7 +23,6 @@ const useStyles = makeStyles((theme) => ({
 
 export default function ListBooks(props) {
   let books = props.books;
-
   const readers = books
     .map((book) => book.reader)
     .filter((v, i, a) => a.indexOf(v) === i)
@@ -90,6 +89,7 @@ export default function ListBooks(props) {
             <TableCell>Datum</TableCell>
             <TableCell>Bralec</TableCell>
             <TableCell>Naslov knjige</TableCell>
+            <TableCell>Žanr</TableCell>
             <TableCell>Avtor</TableCell>
             <TableCell>Št. Strani</TableCell>
           </TableRow>
@@ -102,6 +102,7 @@ export default function ListBooks(props) {
                     <TableCell>{book.date_read}</TableCell>
                     <TableCell>{book.reader}</TableCell>
                     <TableCell>{book.name}</TableCell>
+                    <TableCell>{book.genre}</TableCell>
                     <TableCell>{book.author}</TableCell>
                     <TableCell>{book.pages}</TableCell>
                   </TableRow>
@@ -116,6 +117,7 @@ export default function ListBooks(props) {
                     <TableCell>{book.date_read}</TableCell>
                     <TableCell>{book.reader}</TableCell>
                     <TableCell>{book.name}</TableCell>
+                    <TableCell>{book.genre}</TableCell>
                     <TableCell>{book.author}</TableCell>
                     <TableCell>{book.pages}</TableCell>
                   </TableRow>
@@ -130,6 +132,7 @@ export default function ListBooks(props) {
                     <TableCell>{book.date_read}</TableCell>
                     <TableCell>{book.reader}</TableCell>
                     <TableCell>{book.name}</TableCell>
+                    <TableCell>{book.genre}</TableCell>
                     <TableCell>{book.author}</TableCell>
                     <TableCell>{book.pages}</TableCell>
                   </TableRow>
@@ -144,6 +147,7 @@ export default function ListBooks(props) {
                     <TableCell>{book.date_read}</TableCell>
                     <TableCell>{book.reader}</TableCell>
                     <TableCell>{book.name}</TableCell>
+                    <TableCell>{book.genre}</TableCell>
                     <TableCell>{book.author}</TableCell>
                     <TableCell>{book.pages}</TableCell>
                   </TableRow>

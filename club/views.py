@@ -3,9 +3,12 @@ from django.shortcuts import render
 from .models import Book, Reader, Season, Team
 from datetime import date, timedelta
 import math
+from .barbara import Barbara
 
 
 def index(request, **kwargs):
+    if "import" in kwargs:
+        Barbara()
 
     # get URL params and kwargs for team and season
     if "team" in kwargs:
@@ -37,6 +40,8 @@ def index(request, **kwargs):
         Book.objects.filter(reader__in=query_readers)
         .filter(
             date_read__gte=query_season[0].season_start,
+        )
+        .filter(
             date_read__lte=query_season[0].season_end,
         )
         .order_by("date_read")
@@ -128,6 +133,7 @@ def index(request, **kwargs):
                 "name": book.name,
                 "pages": book.pages,
                 "description": book.description,
+                "genre": book.genre,
             }
         )
 
@@ -262,7 +268,11 @@ def index(request, **kwargs):
 
     # books per date
     date_book_current = query_season[0].season_start
-    date_diff = (date_today - date_book_current).days
+    date_diff = 0
+    if date_today < query_season[0].season_end:
+        date_diff = (date_today - date_book_current).days
+    else:
+        date_diff = (query_season[0].season_end - query_season[0].season_start).days
     date_counter = 0
     books_per_date = []
     cumulative_sum = 0

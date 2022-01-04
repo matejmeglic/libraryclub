@@ -14,15 +14,21 @@ genre_choices = (
     ("crime", "Crime"),
     ("detective", "Detective/Mysery"),
     ("thriller", "Thriller"),
-    ("historica", "Historical"),
+    ("historical", "Historical"),
     ("politics", "Politics"),
     ("selfimprovement", "Self-improvement"),
     ("business", "Business"),
     ("poetry", "Poetry"),
     ("philosophy", "Philosophy"),
     ("social", "Social"),
+    ("technology", "Technology"),
     ("studymaterial", "Study materials"),
     ("cookbook", "Cook-book"),
+    ("youth", "Youth"),
+    ("environment", "Environment"),
+    ("manual", "Manual"),
+    ("sport", "Sport"),
+    ("classic", "Classics"),
 )
 
 
